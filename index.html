@@ -155,30 +155,35 @@ function autoZy(t){if(zc.has(t))return zc.get(t);let r="";
 /*ZY-END*/
 
 /* ---- data ---- */
-const SID="1oCpeIpa2bEA6Pm8oP4aEsfyskDFSwitmIG8AwVNQzD8",DAYS=["週日","週一","週二","週三","週四","週五","週六"],COLORS=["#3b6df0","#2fb36d","#ffb020","#ef5350","#9b5de5","#14b8a6","#ff7a3d"];
+const SID="1oCpeIpa2bEA6Pm8oP4aEsfyskDFSwitmIG8AwVNQzD8",DAYS=["週日","週一","週二","週三","週四","週五","週六"],PAL={藍:"#3b6df0",綠:"#2fb36d",黃:"#ffb020",紅:"#ef5350",紫:"#9b5de5",青:"#14b8a6",橘:"#ff7a3d",粉:"#ff6fa5",棕:"#a1683a",灰:"#8a8494",深藍:"#1e40af",草綠:"#84cc16"},COLORS=Object.values(PAL);
 const G=[{k:"幼兒園",z:"ㄧㄡˋ ㄦˊ ㄩㄢˊ",c:"#ff6fa5"},{k:"國小",z:"ㄍㄨㄛˊ ㄒㄧㄠˇ",c:"#3b6df0"},{k:"一起",z:"ㄧˋ ㄑㄧˇ",c:"#7a7585"}];
 const gInfo=k=>G.find(x=>x.k===k)||G[2],gOf=it=>it.g||"一起";
 const inG=(it,g)=>gOf(it)==="一起"||gOf(it)===g;
 const chip=g=>`<span class="gc" style="background:${gInfo(g).c}">${zy(g,gInfo(g).z)}</span>`;
-const zi=it=>zy(it.t,it.z||autoZy(it.t));
+const zi=it=>zy(it.t,zmap[it.t]||autoZy(it.t));
 const MSG={off:["今天放假","ㄐㄧㄣ ㄊㄧㄢ ㄈㄤˋ ㄐㄧㄚˋ"],load:["課表讀取中","ㄎㄜˋ ㄅㄧㄠˇ ㄉㄨˊ ㄑㄩˇ ㄓㄨㄥ"],err:["讀不到課表","ㄉㄨˊ ㄅㄨˊ ㄉㄠˋ ㄎㄜˋ ㄅㄧㄠˇ"]};
 const LV=[["🤐","不說話","ㄅㄨˋ ㄕㄨㄛ ㄏㄨㄚˋ","#3fbf7f"],["🤫","耳語","ㄦˇ ㄩˇ","#8bc34a"],["👥","小聲討論","ㄒㄧㄠˇ ㄕㄥ ㄊㄠˇ ㄌㄨㄣˋ","#ffc233"],["🗣️","正常說話","ㄓㄥˋ ㄔㄤˊ ㄕㄨㄛ ㄏㄨㄚˋ","#ff8a3d"],["📢","大聲發表","ㄉㄚˋ ㄕㄥ ㄈㄚ ㄅㄧㄠˇ","#ef5350"]];
 let items=[],vol=3,outdoor=false,view="全部",state="load",curDay=-1,curSheet="";
 try{view=localStorage.getItem("kids-dash-view")||"全部"}catch(e){}
 const sortI=()=>items.sort((a,b)=>toMin(a.s)-toMin(b.s)||toMin(a.e)-toMin(b.e));
-const col=it=>COLORS[Math.max(0,items.indexOf(it))%7];
+let cmap={},zmap={};try{const c=JSON.parse(localStorage.getItem("kids-dash-courses"))||{};cmap=c.cmap||{};zmap=c.zmap||{}}catch(e){}
+const col=it=>{if(cmap[it.t])return cmap[it.t];let h=0;for(const c of it.t)h=(h*31+c.charCodeAt(0))>>>0;return COLORS[h%COLORS.length]};
 
 const parseGviz=t=>[[]].concat(JSON.parse(t.slice(t.indexOf("{"),t.lastIndexOf("}")+1)).table.rows.map(r=>[0,1,2,3,4,5].map(i=>{const c=r.c&&r.c[i];return c&&c.v!=null?String(c.v):""})));
 const fixT=s=>{const m=String(s).trim().match(/^(\d{1,2}):(\d{2})/);return m?p2(+m[1])+":"+m[2]:""};
-const toItems=rows=>rows.slice(1).map(r=>{const c=i=>(r[i]||"").trim(),s=fixT(c(0)),e=fixT(c(1)),t=c(2),g=c(4),v=Math.round(parseFloat(c(5)));
- return s&&e&&t&&toMin(s)<toMin(e)?{s,e,t,z:c(3),g:G.some(x=>x.k===g)?g:"一起",v:v>=1&&v<=5?v:null}:null}).filter(Boolean);
+const toItems=rows=>rows.slice(1).map(r=>{const c=i=>(r[i]||"").trim(),s=fixT(c(0)),e=fixT(c(1)),t=c(2),g=c(3),v=Math.round(parseFloat(c(4)));
+ return s&&e&&t&&toMin(s)<toMin(e)?{s,e,t,g:G.some(x=>x.k===g)?g:"一起",v:v>=1&&v<=5?v:null}:null}).filter(Boolean);
 const ck=n=>"kids-dash-sched-"+n;
 function setDay(){const d=new Date().getDay();curDay=d;items=[];
  if(d===0||d===6){state="off";curSheet="";renderDisplay();return}
  curSheet=DAYS[d];let c=null;try{c=JSON.parse(localStorage.getItem(ck(curSheet)))}catch(e){}
  if(c&&Array.isArray(c.items)){items=c.items;state="ok"}else state="load";
  sortI();renderDisplay();fetchSheet()}
-async function fetchSheet(){const n=curSheet;if(!n)return;
+async function fetchCourses(){
+ try{const r=await fetch(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent("課程清單")}`,{cache:"no-store"});
+  if(!r.ok)return;const m={},zm={};parseGviz(await r.text()).slice(1).forEach(x=>{const t=(x[0]||"").trim(),c=PAL[(x[1]||"").trim()],z=(x[2]||"").trim();if(t&&c)m[t]=c;if(t&&z)zm[t]=z});
+  cmap=m;zmap=zm;try{localStorage.setItem("kids-dash-courses",JSON.stringify({cmap,zmap}))}catch(e){}renderDisplay()}catch(e){}}
+async function fetchSheet(){const n=curSheet;if(!n)return;fetchCourses();
  try{const r=await fetch(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:json&headers=1&sheet=${encodeURIComponent(n)}`,{cache:"no-store"});
   if(!r.ok)throw 0;const t=await r.text();if(/^\s*</.test(t))throw 0;
   const it=toItems(parseGviz(t));if(n!==curSheet)return;
