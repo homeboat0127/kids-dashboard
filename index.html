@@ -14,7 +14,7 @@ body{color:var(--text);font-family:"Noto Sans TC","PingFang TC","Microsoft Jheng
 #stage{position:fixed;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;background:var(--bg)}
 .wrap{height:100%;padding:20px;display:grid;gap:20px;grid-template-columns:560px 1fr;grid-template-rows:84px 1fr}
 .today{grid-column:1/-1;display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:700;background:var(--accent);color:#fff;border-radius:24px}
-.today .zz,button .zz,.tag .zz,.gc .zz{color:inherit}
+.today .zz,button .zz,.gc .zz{color:inherit}
 .lcol{display:flex;flex-direction:column;gap:20px;min-height:0}
 .card{background:var(--card);border:3px solid var(--line);border-radius:24px;padding:16px 20px;min-height:0}
 .clk{flex:1;display:flex;flex-direction:column}
@@ -50,23 +50,17 @@ button{color:#fff;background:var(--accent);border:0;border-radius:14px;padding:4
 .banner.one .bl{font-size:30px}
 .tmx{color:var(--mute);font-size:18px;font-weight:500}
 .gc{display:inline-block;font-size:16px;font-weight:600;color:#fff;border-radius:99px;padding:0 10px;line-height:1.9;flex:none;text-align:center;white-space:nowrap}
-.brow{display:flex;align-items:center;gap:8px;margin-bottom:4px}.brow .gc{width:104px}
-.bar{position:relative;height:22px;border-radius:11px;background:var(--line);overflow:hidden;display:flex;flex:1}
-.seg{height:100%;border-right:3px solid var(--card);opacity:.5}.seg.on{opacity:1}
-.nowline{position:absolute;top:0;bottom:0;width:5px;background:var(--bad);border-radius:3px}
-.ends{display:flex;justify-content:space-between;color:var(--mute);font-size:16px;margin:0 4px 6px;font-variant-numeric:tabular-nums}
-#list{flex:1;min-height:0;overflow-y:auto}
-#list.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+#list{--fs:34px;flex:1;min-height:0;overflow:hidden}
+#list.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
 .gh{margin:2px 0}
-.row{display:flex;align-items:center;gap:10px;padding:2px 12px;border-radius:14px;border:3px solid transparent;font-size:24px}
-.row .dot{width:14px;height:14px;border-radius:50%;flex:none}
-.row .tm{font-variant-numeric:tabular-nums;color:var(--mute);width:150px;flex:none;font-size:19px}
-.row .tt{flex:1;min-width:0}
+.row{display:flex;align-items:center;gap:.4em;padding:2px 12px;border-radius:14px;border:3px solid transparent;font-size:var(--fs);white-space:nowrap}
+.row .dot{width:.55em;height:.55em;border-radius:50%;flex:none}
+.row .tm{font-variant-numeric:tabular-nums;color:var(--text);opacity:.85;width:6.6em;flex:none;font-size:.8em}
+.row .tt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .row.now{background:var(--now);border-color:var(--accent);font-weight:700}
+.row.nx{border:3px dashed var(--mute)}
 .row.past{opacity:.4}
-.two .row{font-size:21px;padding:1px 8px;gap:8px}.two .tm{width:120px;font-size:16px}
-.tag{font-size:16px;background:var(--accent);color:#fff;border-radius:99px;padding:0 10px;flex:none;line-height:1.9}
-.tag.next{background:var(--mute)}
+.two .row{padding:1px 8px}
 #meter{display:flex;gap:10px;height:72px;align-items:flex-end}#meter b{flex:1;border-radius:10px;background:var(--line);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--mute)}
 .vrow{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 #face{font-size:44px;line-height:1}#vtxt{font-size:26px;font-weight:700;flex:1}
@@ -100,8 +94,6 @@ button{color:#fff;background:var(--accent);border:0;border-radius:14px;padding:4
  <div class="card sch">
   <div class="sh"><h2 class="zy" data-z="ㄐㄧㄣ ㄊㄧㄢ ˙ㄉㄜ ㄒㄧㄥˊ ㄔㄥˊ">今天的行程</h2><div id="tabs"></div></div>
   <div class="banner" id="banner"></div>
-  <div id="bars"></div>
-  <div class="ends" id="ends"><span id="e1"></span><span id="e2"></span></div>
   <div id="list"></div>
  </div>
 </div></div>
@@ -168,7 +160,6 @@ const G=[{k:"幼兒園",z:"ㄧㄡˋ ㄦˊ ㄩㄢˊ",c:"#ff6fa5"},{k:"國小",z:"
 const gInfo=k=>G.find(x=>x.k===k)||G[2],gOf=it=>it.g||"一起";
 const inG=(it,g)=>gOf(it)==="一起"||gOf(it)===g;
 const chip=g=>`<span class="gc" style="background:${gInfo(g).c}">${zy(g,gInfo(g).z)}</span>`;
-const tag=(t,z,c)=>`<span class="tag ${c}">${zy(t,z)}</span>`;
 const zi=it=>zy(it.t,it.z||autoZy(it.t));
 const MSG={off:["今天放假","ㄐㄧㄣ ㄊㄧㄢ ㄈㄤˋ ㄐㄧㄚˋ"],load:["課表讀取中","ㄎㄜˋ ㄅㄧㄠˇ ㄉㄨˊ ㄑㄩˇ ㄓㄨㄥ"],err:["讀不到課表","ㄉㄨˊ ㄅㄨˊ ㄉㄠˋ ㄎㄜˋ ㄅㄧㄠˇ"]};
 const LV=[["🤐","不說話","ㄅㄨˋ ㄕㄨㄛ ㄏㄨㄚˋ","#3fbf7f"],["🤫","耳語","ㄦˇ ㄩˇ","#8bc34a"],["👥","小聲討論","ㄒㄧㄠˇ ㄕㄥ ㄊㄠˇ ㄌㄨㄣˋ","#ffc233"],["🗣️","正常說話","ㄓㄥˋ ㄔㄤˊ ㄕㄨㄛ ㄏㄨㄚˋ","#ff8a3d"],["📢","大聲發表","ㄉㄚˋ ㄕㄥ ㄈㄚ ㄅㄧㄠˇ","#ef5350"]];
@@ -207,36 +198,29 @@ function renderDisplay(){
  const cu=items.filter(it=>vg.some(g=>inG(it,g))&&inR(it)),vs=cu.map(it=>it.v).filter(v=>v);
  outdoor=cu.length>0&&!vs.length;vol=vs.length?Math.min(...vs):3;paintVol();
  if(state!=="ok"){const m=MSG[state];$("list").className="";$("list").innerHTML=`<div class="msg">${zy(m[0],m[1])}</div>`;
-  $("banner").innerHTML="";$("bars").innerHTML="";$("e1").textContent="";$("e2").textContent="";return}
+  $("banner").innerHTML="";return}
  const curS=new Set(),nxtS=new Set();
  vg.forEach(g=>{const l=gi(g),c=l.find(inR),n=l.find(it=>toMin(it.s)>nm);if(c)curS.add(c);if(n)nxtS.add(n)});
  $("banner").style.gridTemplateColumns=`repeat(${vg.length},1fr)`;
  const list=$("list");list.innerHTML="";list.className=multi?"two":"";
  vg.forEach(g=>{const c=document.createElement("div");if(multi)c.innerHTML=`<div class="gh">${chip(g)}</div>`;
   gi(g).forEach(it=>{const r=document.createElement("div");
-   r.className="row"+(curS.has(it)?" now":"")+(toMin(it.e)<=nm?" past":"");
-   r.innerHTML=`<span class="dot" style="background:${col(it)}"></span><span class="tm">${it.s} – ${it.e}</span><span class="tt">${zi(it)}</span>`+
-    (curS.has(it)?tag("現在","ㄒㄧㄢˋ ㄗㄞˋ",""):nxtS.has(it)?tag("下一個","ㄒㄧㄚˋ ㄧˊ ㄍㄜ˙","next"):"");
+   r.className="row"+(curS.has(it)?" now":nxtS.has(it)?" nx":"")+(toMin(it.e)<=nm?" past":"");
+   r.innerHTML=`<span class="dot" style="background:${col(it)}"></span><span class="tm">${it.s} – ${it.e}</span><span class="tt">${zi(it)}</span>`;
    c.append(r)});list.append(c)});
  const all=vg.flatMap(gi);
- if(!all.length){$("banner").innerHTML="";$("bars").innerHTML="";$("e1").textContent=$("e2").textContent="";return}
- const start=Math.min(...all.map(i=>toMin(i.s))),end=Math.max(...all.map(i=>toMin(i.e))),span=end-start||1,hm=m=>`${p2(Math.floor(m/60))}:${p2(m%60)}`;
- $("e1").textContent=hm(start);$("e2").textContent=hm(end);$("ends").style.padding=multi?"0 4px 0 108px":"0 4px";
+ if(!all.length){$("banner").innerHTML="";return}
  $("banner").innerHTML=vg.map(g=>{const l=gi(g);let cur,nx="";
   if(!l.length)cur=zy("沒有行程","ㄇㄟˊ ㄧㄡˇ ㄒㄧㄥˊ ㄔㄥˊ");
   else{const s=Math.min(...l.map(x=>toMin(x.s))),e=Math.max(...l.map(x=>toMin(x.e))),c=l.find(inR),n=l.find(it=>toMin(it.s)>nm);
    cur=c?zi(c):nm<s?zy("還沒開始","ㄏㄞˊ ㄇㄟˊ ㄎㄞ ㄕˇ"):nm>=e?zy("結束囉","ㄐㄧㄝˊ ㄕㄨˋ ㄌㄨㄛ˙"):zy("休息一下","ㄒㄧㄡ ㄒㄧˊ ㄧˊ ㄒㄧㄚˋ");
    nx=n?zi(n)+` <span class="tmx">${n.s}</span>`:zy("沒有了","ㄇㄟˊ ㄧㄡˇ ˙ㄌㄜ")}
   return `<div class="bk">${chip(g)}<div class="bc"><div class="nr now"><span class="lb">${zy("現在","ㄒㄧㄢˋ ㄗㄞˋ")}</span><span class="nt">${cur}</span></div><div class="nr"><span class="lb">${zy("下一個","ㄒㄧㄚˋ ㄧˊ ㄍㄜ˙")}</span><span class="nt">${nx}</span></div></div></div>`}).join("");
- const bars=$("bars");bars.innerHTML="";
- vg.forEach(g=>{const row=document.createElement("div");row.className="brow";if(multi)row.innerHTML=chip(g);
-  const bar=document.createElement("div");bar.className="bar";let pos=start;
-  gi(g).forEach(it=>{const s=toMin(it.s),e=toMin(it.e);
-   if(s>pos){const x=document.createElement("div");x.className="seg";x.style.cssText=`width:${(s-pos)/span*100}%;background:transparent`;bar.append(x)}
-   const sg=document.createElement("div");sg.className="seg"+(curS.has(it)?" on":"");sg.style.cssText=`width:${(e-Math.max(s,pos))/span*100}%;background:${col(it)}`;bar.append(sg);pos=Math.max(pos,e)});
-  if(nm>=start&&nm<=end){const l=document.createElement("div");l.className="nowline";l.style.left=`calc(${(nm-start)/span*100}% - 2px)`;bar.append(l)}
-  row.append(bar);bars.append(row)});
+ fitList()
 }
+const FMAX=34,FMIN=16;
+function fitList(){const l=$("list"),bad=()=>l.scrollHeight>l.clientHeight+1||[...l.querySelectorAll(".tt")].some(e=>e.scrollWidth>e.clientWidth+1);
+ let f=FMAX;l.style.setProperty("--fs",f+"px");while(f>FMIN&&bad())l.style.setProperty("--fs",--f+"px")}
 function paintVol(){[...$("meter").children].forEach((b,i)=>{const on=!outdoor&&i<vol;b.style.background=on?LV[i][3]:"var(--line)";b.style.color=on?"#fff":"var(--mute)"});
  $("meter").style.opacity=outdoor?.5:1;
  if(outdoor){$("face").textContent="🌳";$("vtxt").innerHTML=zy("戶外時間","ㄏㄨˋ ㄨㄞˋ ㄕˊ ㄐㄧㄢ");return}
