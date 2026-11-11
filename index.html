@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>我的一天</title>
+<style>
+:root{--bg:#fff6e3;--card:#fffdf7;--text:#2b2a33;--mute:#7a7585;--line:#eadfc8;--accent:#ff8a3d;--now:#ffe9c9;--face:#fff;--bad:#ef5350;--hh:#3b6df0;--mh:#2fb36d;--out:#2b2433}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1620;--card:#241f2d;--text:#f3eefc;--mute:#a79fb8;--line:#383044;--now:#4a3322;--face:#2d2738;--out:#000}}
+:root[data-theme="dark"]{--bg:#1a1620;--card:#241f2d;--text:#f3eefc;--mute:#a79fb8;--line:#383044;--now:#4a3322;--face:#2d2738;--out:#000}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden;background:var(--out)}
+html.ed,html.ed body{overflow:auto;height:auto;background:var(--bg)}
+body{color:var(--text);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;line-height:1.5}
+#stage{position:fixed;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;background:var(--bg)}
+.wrap{height:100%;padding:20px;display:grid;gap:20px;grid-template-columns:560px 1fr;grid-template-rows:84px 1fr}
+.today{grid-column:1/-1;display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:700;background:var(--accent);color:#fff;border-radius:24px}
+.today .zz,button .zz,.tag .zz,.gc .zz{color:inherit}
+.lcol{display:flex;flex-direction:column;gap:20px;min-height:0}
+.card{background:var(--card);border:3px solid var(--line);border-radius:24px;padding:16px 20px;min-height:0}
+.clk{flex:1;display:flex;flex-direction:column}
+.sch{display:flex;flex-direction:column}
+h2{margin:0 0 4px;font-size:30px}
+.zc{display:inline-flex;align-items:center;vertical-align:middle;margin-right:.1em}
+.zz{display:inline-flex;align-items:center;margin-left:.05em;color:var(--mute);font-size:.36em;line-height:1;font-weight:500}
+.zs{writing-mode:vertical-rl;text-orientation:upright}
+.zt{margin-left:.06em;font-size:1.15em}
+svg{flex:1 1 0;min-height:0;width:100%;display:block}
+.face{fill:var(--face);stroke:var(--accent);stroke-width:8}
+.tk{stroke:var(--mute);stroke-width:2}.tk.big{stroke:var(--text);stroke-width:4}
+.num{font-size:30px;font-weight:700;fill:var(--text);text-anchor:middle;dominant-baseline:central}
+.hand{stroke-linecap:round}
+button,select{font:inherit}
+button{color:#fff;background:var(--accent);border:0;border-radius:14px;padding:4px 16px;cursor:pointer;font-size:20px}
+button.ghost{background:transparent;color:var(--mute);border:2px solid var(--line);padding:0 10px;font-size:14px}
+.center{height:56px;display:flex;align-items:center;justify-content:center}
+#digital{display:none;font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;margin-left:14px}
+.sh{display:flex;justify-content:space-between;align-items:center}.sh h2{margin:0}
+.tab{background:var(--line);color:var(--text);font-size:20px;padding:0 14px;margin-left:8px}.tab.on{background:var(--accent);color:#fff}
+.banner{display:grid;gap:12px;margin:6px 0 10px}
+.bk{border:3px solid var(--line);border-radius:18px;padding:4px 12px 6px;min-width:0}
+.bk .gc{width:auto;min-width:104px;font-size:18px;margin-bottom:2px}
+.bc{flex:1;min-width:0}
+.nr{display:flex;align-items:center;gap:16px;border-radius:12px;padding:0 10px;font-size:24px;font-weight:700;line-height:1.5;white-space:nowrap;overflow:hidden}
+.nr.now{background:var(--now);box-shadow:inset 0 0 0 2px var(--accent)}
+.nr .lb{font-size:17px;font-weight:500;color:var(--mute);width:104px;flex:none}
+.nt{min-width:0;overflow:hidden}
+.bn{border-radius:18px;padding:2px 14px;background:var(--now);border:3px solid var(--accent);min-width:0}
+.bn.nx{background:transparent;border-color:var(--line)}
+.bn small{display:block;color:var(--mute);font-size:18px;line-height:1.5}
+.bl{font-size:26px;font-weight:700;line-height:1.5;display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden}
+.banner.one .bl{font-size:30px}
+.tmx{color:var(--mute);font-size:18px;font-weight:500}
+.gc{display:inline-block;font-size:16px;font-weight:600;color:#fff;border-radius:99px;padding:0 10px;line-height:1.9;flex:none;text-align:center;white-space:nowrap}
+.brow{display:flex;align-items:center;gap:8px;margin-bottom:4px}.brow .gc{width:104px}
+.bar{position:relative;height:22px;border-radius:11px;background:var(--line);overflow:hidden;display:flex;flex:1}
+.seg{height:100%;border-right:3px solid var(--card);opacity:.5}.seg.on{opacity:1}
+.nowline{position:absolute;top:0;bottom:0;width:5px;background:var(--bad);border-radius:3px}
+.ends{display:flex;justify-content:space-between;color:var(--mute);font-size:16px;margin:0 4px 6px;font-variant-numeric:tabular-nums}
+#list{flex:1;min-height:0;overflow-y:auto}
+#list.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.gh{margin:2px 0}
+.row{display:flex;align-items:center;gap:10px;padding:2px 12px;border-radius:14px;border:3px solid transparent;font-size:24px}
+.row .dot{width:14px;height:14px;border-radius:50%;flex:none}
+.row .tm{font-variant-numeric:tabular-nums;color:var(--mute);width:150px;flex:none;font-size:19px}
+.row .tt{flex:1;min-width:0}
+.row.now{background:var(--now);border-color:var(--accent);font-weight:700}
+.row.past{opacity:.4}
+.two .row{font-size:21px;padding:1px 8px;gap:8px}.two .tm{width:120px;font-size:16px}
+.tag{font-size:16px;background:var(--accent);color:#fff;border-radius:99px;padding:0 10px;flex:none;line-height:1.9}
+.tag.next{background:var(--mute)}
+#meter{display:flex;gap:10px;height:72px;align-items:flex-end}#meter b{flex:1;border-radius:10px;background:var(--line);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--mute)}
+.vrow{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+#face{font-size:44px;line-height:1}#vtxt{font-size:26px;font-weight:700;flex:1}
+#editlink{position:absolute;right:28px;bottom:2px;font-size:14px;color:var(--mute);opacity:.6;text-decoration:none}
+/* edit page */
+#editpage{display:none;background:var(--bg);min-height:100%}
+.ep{max-width:760px;margin:0 auto;padding:16px;font-size:16px}
+.ep h1{font-size:24px;margin:8px 0}.ep h3{margin:18px 0 8px}
+.eh{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--mute);font-size:14px}.eh a{color:var(--accent)}
+#editpage.ro #ed,#editpage.ro #vbtn,#editpage.ro .addf{pointer-events:none;opacity:.5}
+.ep input,.ep select{font:inherit;font-size:15px;color:var(--text);background:var(--card);border:2px solid var(--line);border-radius:10px;padding:5px 7px}
+.ep input[type=color]{width:42px;height:34px;padding:0}
+.ep button{font-size:15px;padding:6px 12px}
+.ei{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px;margin-bottom:10px;display:grid;gap:8px}
+.r{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.r .w{flex:1;min-width:130px}
+.pv{font-size:20px;min-height:30px}
+#vbtn{display:flex;gap:8px;flex-wrap:wrap}#vbtn button{background:var(--line);color:var(--text)}
+</style>
+</head>
+<body>
+<div id="stage"><div class="wrap">
+ <div class="today" id="today"></div>
+ <div class="lcol">
+  <div class="card clk">
+   <h2 class="zy" data-z="ㄎㄢˋ ㄕˊ ㄓㄨㄥ">看時鐘</h2>
+   <svg viewBox="0 0 300 300" aria-label="時鐘">
+    <circle class="face" cx="150" cy="150" r="142"/>
+    <g id="ticks"></g><g id="nums"></g>
+    <line id="hh" class="hand" x1="150" y1="150" x2="150" y2="98" stroke="var(--hh)" stroke-width="12"/>
+    <line id="mh" class="hand" x1="150" y1="150" x2="150" y2="58" stroke="var(--mh)" stroke-width="8"/>
+    <line id="sh" class="hand" x1="150" y1="165" x2="150" y2="50" stroke="var(--bad)" stroke-width="3"/>
+    <circle cx="150" cy="150" r="9" fill="var(--text)"/>
+   </svg>
+   <div class="center"><button id="peek"></button><span id="digital"></span></div>
+  </div>
+  <div class="card vol">
+   <h2 class="zy" data-z="ㄧㄣ ㄌㄧㄤˋ ㄅㄧㄠˇ">音量表</h2>
+   <div class="vrow"><span id="face"></span><span id="vtxt"></span></div>
+   <div id="meter"></div>
+  </div>
+ </div>
+ <div class="card sch">
+  <div class="sh"><h2 class="zy" data-z="ㄐㄧㄣ ㄊㄧㄢ ˙ㄉㄜ ㄒㄧㄥˊ ㄔㄥˊ">今天的行程</h2><div id="tabs"></div></div>
+  <div class="banner" id="banner"></div>
+  <div id="bars"></div>
+  <div class="ends" id="ends"><span id="e1"></span><span id="e2"></span></div>
+  <div id="list"></div>
+ </div>
+ <a id="editlink" href="#edit">✏️ 編輯</a>
+</div></div>
+
+<div id="editpage"><div class="ep">
+ <div class="eh"><a href="#">← 回到顯示畫面</a><span id="status"></span></div>
+ <h1>編輯畫面(大人使用)</h1>
+ <h3>音量等級</h3><div id="vbtn"></div>
+ <h3>新增行程</h3>
+ <div class="ei addf">
+  <div class="r"><input type="color" id="nc" value="#3b6df0"><input type="time" id="ns" value="09:00"><span>–</span><input type="time" id="ne" value="10:00">
+   <select id="ng"><option>幼兒園</option><option selected>國小</option><option>一起</option></select></div>
+  <div class="r"><input class="w" type="text" id="nt" placeholder="行程名稱"><input class="w" type="text" id="nz" placeholder="注音:每個字一組,用空格隔開"></div>
+  <div class="r"><button id="addBtn">新增</button></div>
+ </div>
+ <h3>所有行程(直接修改,會自動儲存)</h3>
+ <div id="ed"></div>
+ <button class="ghost" id="resetBtn" style="color:var(--mute);background:none;border:2px solid var(--line)">還原預設</button>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const isCJK=c=>/[\u3400-\u9fff]/.test(c);
+function zy(text,z){const t=(z||"").trim().split(/\s+/).filter(Boolean);let k=0,h="";
+ for(const c of text){if(!(isCJK(c)&&k<t.length)){h+=esc(c);continue}
+  const z1=t[k++],nu=/˙/.test(z1),tn=(z1.match(/[ˊˇˋ]/)||[""])[0],sy=z1.replace(/[˙ˊˇˋ]/g,"");
+  h+=`<span class="zc"><span class="ch">${esc(c)}</span><span class="zz"><span class="zs">${nu?"˙":""}${esc(sy)}</span>${tn?`<span class="zt">${tn}</span>`:""}</span></span>`}return h}
+document.querySelectorAll(".zy").forEach(e=>e.innerHTML=zy(e.textContent,e.dataset.z));
+const p2=n=>String(n).padStart(2,"0"),toMin=s=>{const[a,b]=s.split(":").map(Number);return a*60+b};
+
+/* ---- analog clock ---- */
+const NS="http://www.w3.org/2000/svg";
+for(let i=0;i<60;i++){const a=i*6*Math.PI/180,b=i%5==0,r1=b?122:130,l=document.createElementNS(NS,"line");
+ l.setAttribute("x1",150+r1*Math.sin(a));l.setAttribute("y1",150-r1*Math.cos(a));
+ l.setAttribute("x2",150+138*Math.sin(a));l.setAttribute("y2",150-138*Math.cos(a));
+ l.setAttribute("class",b?"tk big":"tk");$("ticks").append(l)}
+for(let i=1;i<=12;i++){const a=i*30*Math.PI/180,t=document.createElementNS(NS,"text");
+ t.setAttribute("x",150+100*Math.sin(a));t.setAttribute("y",150-100*Math.cos(a));t.setAttribute("class","num");t.textContent=i;$("nums").append(t)}
+const rot=(id,d)=>$(id).setAttribute("transform",`rotate(${d} 150 150)`);
+const DN=["日","一","二","三","四","五","六"],DZ=["ㄖˋ","ㄧ","ㄦˋ","ㄙㄢ","ㄙˋ","ㄨˇ","ㄌㄧㄡˋ"];
+let peek=false;
+function setPeek(){$("digital").style.display=peek?"inline":"none";
+ $("peek").innerHTML=peek?zy("藏起來","ㄘㄤˊ ㄑㄧˇ ㄌㄞˊ"):zy("偷看數字時間","ㄊㄡ ㄎㄢˋ ㄕㄨˋ ㄗˋ ㄕˊ ㄐㄧㄢ")}
+$("peek").onclick=()=>{peek=!peek;setPeek()};setPeek();
+function tick(){
+ const n=new Date(),h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+ rot("hh",(h%12)*30+m*.5);rot("mh",m*6+s*.1);rot("sh",s*6);
+ const ap=h<12?["上午","ㄕㄤˋ ㄨˇ"]:h<13?["中午","ㄓㄨㄥ ㄨˇ"]:h<18?["下午","ㄒㄧㄚˋ ㄨˇ"]:["晚上","ㄨㄢˇ ㄕㄤˋ"];
+ $("digital").innerHTML=zy(ap[0],ap[1])+` ${p2(h%12||12)}:${p2(m)}`;
+ $("today").innerHTML=zy(n.getFullYear()+"年"+(n.getMonth()+1)+"月"+n.getDate()+"日（"+DN[n.getDay()]+"）","ㄋㄧㄢˊ ㄩㄝˋ ㄖˋ "+DZ[n.getDay()]);
+}
+
+/* ---- data ---- */
+const KEY="kids-dash-v3",COLORS=["#3b6df0","#2fb36d","#ffb020","#ef5350","#9b5de5","#14b8a6","#ff7a3d"];
+const G=[{k:"幼兒園",z:"ㄧㄡˋ ㄦˊ ㄩㄢˊ",c:"#ff6fa5"},{k:"國小",z:"ㄍㄨㄛˊ ㄒㄧㄠˇ",c:"#3b6df0"},{k:"一起",z:"ㄧˋ ㄑㄧˇ",c:"#7a7585"}];
+const gInfo=k=>G.find(x=>x.k===k)||G[2],gOf=it=>{const g=it.g||"一起";return g==="全校"?"一起":g};
+const inG=(it,g)=>gOf(it)==="一起"||gOf(it)===g;
+const chip=g=>`<span class="gc" style="background:${gInfo(g).c}">${zy(g,gInfo(g).z)}</span>`;
+const tag=(t,z,c)=>`<span class="tag ${c}">${zy(t,z)}</span>`;
+const DEFAULT=[
+ {s:"09:00",e:"09:30",t:"語文",z:"ㄩˇ ㄨㄣˊ",g:"幼兒園"},
+ {s:"09:00",e:"10:30",t:"語文",z:"ㄩˇ ㄨㄣˊ",g:"國小"},
+ {s:"09:40",e:"11:30",t:"戶外幼兒",z:"ㄏㄨˋ ㄨㄞˋ ㄧㄡˋ ㄦˊ",g:"幼兒園"},
+ {s:"10:50",e:"11:50",t:"數學",z:"ㄕㄨˋ ㄒㄩㄝˊ",g:"國小"},
+ {s:"11:50",e:"12:40",t:"吃飯、看電視",z:"ㄔ ㄈㄢˋ ㄎㄢˋ ㄉㄧㄢˋ ㄕˋ",g:"一起"},
+ {s:"13:00",e:"13:30",t:"睡覺",z:"ㄕㄨㄟˋ ㄐㄧㄠˋ",g:"國小"},
+ {s:"13:00",e:"14:30",t:"睡覺",z:"ㄕㄨㄟˋ ㄐㄧㄠˋ",g:"幼兒園"},
+ {s:"13:30",e:"13:40",t:"規劃週計劃",z:"ㄍㄨㄟ ㄏㄨㄚˋ ㄓㄡ ㄐㄧˋ ㄏㄨㄚˋ",g:"國小"},
+ {s:"13:40",e:"14:30",t:"自由遊戲",z:"ㄗˋ ㄧㄡˊ ㄧㄡˊ ㄒㄧˋ",g:"國小"},
+ {s:"14:30",e:"15:30",t:"世導",z:"ㄕˋ ㄉㄠˇ",g:"一起"},
+ {s:"15:45",e:"16:15",t:"結束圈、打掃",z:"ㄐㄧㄝˊ ㄕㄨˋ ㄑㄩㄢ ㄉㄚˇ ㄙㄠˇ",g:"一起"},
+ {s:"16:15",e:"16:30",t:"發車",z:"ㄈㄚ ㄔㄜ",g:"一起"}];
+const LV=[["🤐","不說話","ㄅㄨˋ ㄕㄨㄛ ㄏㄨㄚˋ","#3fbf7f"],["🤫","耳語","ㄦˇ ㄩˇ","#8bc34a"],["👥","小聲討論","ㄒㄧㄠˇ ㄕㄥ ㄊㄠˇ ㄌㄨㄣˋ","#ffc233"],["🗣️","正常說話","ㄓㄥˋ ㄔㄤˊ ㄕㄨㄛ ㄏㄨㄚˋ","#ff8a3d"],["📢","大聲發表","ㄉㄚˋ ㄕㄥ ㄈㄚ ㄅㄧㄠˇ","#ef5350"]];
+let items=DEFAULT.map(x=>({...x})),vol=2,view="全部",dbRef=null,canW=null,myRev="";
+try{view=localStorage.getItem("kids-dash-view")||"全部"}catch(e){}
+const sortI=()=>items.sort((a,b)=>toMin(a.s)-toMin(b.s)||toMin(a.e)-toMin(b.e));
+const col=it=>it.c||COLORS[Math.max(0,items.indexOf(it))%7];
+function loadLocal(){
+ try{const j=JSON.parse(localStorage.getItem(KEY)||"null");if(j&&Array.isArray(j.items)){items=j.items;vol=+j.vol||vol;return}}catch(e){}
+ try{const o=JSON.parse(localStorage.getItem("kids-dash-v2")||"null");if(Array.isArray(o))items=o;const v=+localStorage.getItem("kids-dash-vol");if(v)vol=v}catch(e){}}
+const saveLocal=()=>{try{localStorage.setItem(KEY,JSON.stringify({items,vol}))}catch(e){}};
+function commit(){
+ sortI();saveLocal();renderAll();
+ if(dbRef&&canW!==false){myRev=Math.random().toString(36).slice(2);
+  dbRef.set(JSON.parse(JSON.stringify({items,vol,rev:myRev}))).catch(e=>{if(e&&e.code==="invalid_argument"){canW=false;setStatus()}})}}
+
+/* ---- display ---- */
+function buildTabs(){const t=$("tabs");t.innerHTML="";
+ [["全部","ㄑㄩㄢˊ ㄅㄨˋ"],["幼兒園",G[0].z],["國小",G[1].z]].forEach(([k,z])=>{const b=document.createElement("button");
+  b.className="tab"+(view===k?" on":"");b.innerHTML=zy(k,z);
+  b.onclick=()=>{view=k;try{localStorage.setItem("kids-dash-view",k)}catch(e){}buildTabs();renderDisplay()};t.append(b)})}
+function renderDisplay(){
+ const d=new Date(),nm=d.getHours()*60+d.getMinutes()+d.getSeconds()/60;
+ const vg=view==="全部"?["幼兒園","國小"]:[view],multi=vg.length>1;
+ const gi=g=>items.filter(it=>inG(it,g)),inR=it=>nm>=toMin(it.s)&&nm<toMin(it.e);
+ const curS=new Set(),nxtS=new Set();
+ vg.forEach(g=>{const l=gi(g),c=l.find(inR),n=l.find(it=>toMin(it.s)>nm);if(c)curS.add(c);if(n)nxtS.add(n)});
+ $("banner").style.gridTemplateColumns=`repeat(${vg.length},1fr)`;
+ const list=$("list");list.innerHTML="";list.className=multi?"two":"";
+ vg.forEach(g=>{const c=document.createElement("div");if(multi)c.innerHTML=`<div class="gh">${chip(g)}</div>`;
+  gi(g).forEach(it=>{const r=document.createElement("div");
+   r.className="row"+(curS.has(it)?" now":"")+(toMin(it.e)<=nm?" past":"");
+   r.innerHTML=`<span class="dot" style="background:${col(it)}"></span><span class="tm">${it.s} – ${it.e}</span><span class="tt">${zy(it.t,it.z)}</span>`+
+    (curS.has(it)?tag("現在","ㄒㄧㄢˋ ㄗㄞˋ",""):nxtS.has(it)?tag("下一個","ㄒㄧㄚˋ ㄧˊ ㄍㄜ˙","next"):"");
+   c.append(r)});list.append(c)});
+ const all=vg.flatMap(gi);
+ if(!all.length){$("banner").innerHTML="";$("bars").innerHTML="";$("e1").textContent=$("e2").textContent="";return}
+ const start=Math.min(...all.map(i=>toMin(i.s))),end=Math.max(...all.map(i=>toMin(i.e))),span=end-start||1,hm=m=>`${p2(Math.floor(m/60))}:${p2(m%60)}`;
+ $("e1").textContent=hm(start);$("e2").textContent=hm(end);$("ends").style.padding=multi?"0 4px 0 108px":"0 4px";
+ $("banner").innerHTML=vg.map(g=>{const l=gi(g);let cur,nx="";
+  if(!l.length)cur=zy("沒有行程","ㄇㄟˊ ㄧㄡˇ ㄒㄧㄥˊ ㄔㄥˊ");
+  else{const s=Math.min(...l.map(x=>toMin(x.s))),e=Math.max(...l.map(x=>toMin(x.e))),c=l.find(inR),n=l.find(it=>toMin(it.s)>nm);
+   cur=c?zy(c.t,c.z):nm<s?zy("還沒開始","ㄏㄞˊ ㄇㄟˊ ㄎㄞ ㄕˇ"):nm>=e?zy("結束囉","ㄐㄧㄝˊ ㄕㄨˋ ㄌㄨㄛ˙"):zy("休息一下","ㄒㄧㄡ ㄒㄧˊ ㄧˊ ㄒㄧㄚˋ");
+   nx=n?zy(n.t,n.z)+` <span class="tmx">${n.s}</span>`:zy("沒有了","ㄇㄟˊ ㄧㄡˇ ˙ㄌㄜ")}
+  return `<div class="bk">${chip(g)}<div class="bc"><div class="nr now"><span class="lb">${zy("現在","ㄒㄧㄢˋ ㄗㄞˋ")}</span><span class="nt">${cur}</span></div><div class="nr"><span class="lb">${zy("下一個","ㄒㄧㄚˋ ㄧˊ ㄍㄜ˙")}</span><span class="nt">${nx}</span></div></div></div>`}).join("");
+ const bars=$("bars");bars.innerHTML="";
+ vg.forEach(g=>{const row=document.createElement("div");row.className="brow";if(multi)row.innerHTML=chip(g);
+  const bar=document.createElement("div");bar.className="bar";let pos=start;
+  gi(g).forEach(it=>{const s=toMin(it.s),e=toMin(it.e);
+   if(s>pos){const x=document.createElement("div");x.className="seg";x.style.cssText=`width:${(s-pos)/span*100}%;background:transparent`;bar.append(x)}
+   const sg=document.createElement("div");sg.className="seg"+(curS.has(it)?" on":"");sg.style.cssText=`width:${(e-Math.max(s,pos))/span*100}%;background:${col(it)}`;bar.append(sg);pos=Math.max(pos,e)});
+  if(nm>=start&&nm<=end){const l=document.createElement("div");l.className="nowline";l.style.left=`calc(${(nm-start)/span*100}% - 2px)`;bar.append(l)}
+  row.append(bar);bars.append(row)});
+}
+function paintVol(){[...$("meter").children].forEach((b,i)=>{const on=i<vol;b.style.background=on?LV[i][3]:"var(--line)";b.style.color=on?"#fff":"var(--mute)"});
+ const l=LV[vol-1]||LV[1];$("face").textContent=l[0];$("vtxt").innerHTML=zy("第"+vol+"級 "+l[1],"ㄉㄧˋ ㄐㄧˊ "+l[2])}
+LV.forEach((l,i)=>{const b=document.createElement("b");b.style.height=(40+i*15)+"%";b.textContent=i+1;$("meter").append(b)});
+const renderAll=()=>{renderDisplay();paintVol()};
+
+/* ---- editor (adult view) ---- */
+function buildVbtn(){const b=$("vbtn");b.innerHTML="";
+ LV.forEach((l,i)=>{const x=document.createElement("button");x.textContent=`${i+1} ${l[0]} ${l[1]}`;
+  x.style.background=vol===i+1?l[3]:"var(--line)";x.style.color=vol===i+1?"#fff":"var(--text)";
+  x.onclick=()=>{vol=i+1;commit();buildVbtn()};b.append(x)})}
+function buildEditor(){const box=$("ed");box.innerHTML="";
+ items.forEach(it=>{const d=document.createElement("div");d.className="ei";
+  d.innerHTML=`<div class="r"><input type="color" class="c"><input type="time" class="s"><span>–</span><input type="time" class="e"><select class="g">${G.map(g=>`<option>${g.k}</option>`).join("")}</select><button class="ghost x">刪除</button></div><div class="r"><input class="w t" type="text" placeholder="行程名稱"><input class="w z" type="text" placeholder="注音:每個字一組,用空格隔開"></div><div class="pv"></div>`;
+  const q=s=>d.querySelector(s);
+  q(".c").value=col(it);q(".s").value=it.s;q(".e").value=it.e;q(".g").value=gOf(it);q(".t").value=it.t;q(".z").value=it.z||"";
+  const pv=()=>q(".pv").innerHTML=zy(it.t,it.z);pv();
+  q(".c").onchange=e=>{it.c=e.target.value;commit()};
+  q(".g").onchange=e=>{it.g=e.target.value;commit()};
+  q(".s").onchange=e=>{const v=e.target.value;if(v&&toMin(v)<toMin(it.e)){it.s=v;commit()}else{e.target.value=it.s;alert("開始時間要早於結束時間")}};
+  q(".e").onchange=e=>{const v=e.target.value;if(v&&toMin(v)>toMin(it.s)){it.e=v;commit()}else{e.target.value=it.e;alert("結束時間要晚於開始時間")}};
+  q(".t").oninput=e=>{it.t=e.target.value;pv()};q(".t").onchange=()=>commit();
+  q(".z").oninput=e=>{it.z=e.target.value;pv()};q(".z").onchange=()=>commit();
+  q(".x").onclick=()=>{if(confirm("確定要刪除「"+it.t+"」嗎?")){items.splice(items.indexOf(it),1);commit();buildEditor()}};
+  box.append(d)})}
+$("addBtn").onclick=()=>{const s=$("ns").value,e=$("ne").value,t=$("nt").value.trim();
+ if(!s||!e||!t||toMin(e)<=toMin(s)){alert("請填寫名稱,且結束時間要晚於開始時間。");return}
+ items.push({s,e,t,z:$("nz").value.trim(),g:$("ng").value,c:$("nc").value});$("nt").value=$("nz").value="";commit();buildEditor()};
+$("resetBtn").onclick=()=>{if(confirm("要還原成預設的行程嗎?目前的行程會被取代。")){items=DEFAULT.map(x=>({...x}));vol=2;commit();buildEditor();buildVbtn()}};
+function setStatus(){
+ $("status").textContent=dbRef?(canW===false?"只能查看:這個帳號沒有修改權限":"已連線:修改後其他裝置會同步更新"):"只存在這台裝置的瀏覽器";
+ $("editpage").classList.toggle("ro",canW===false);$("editlink").style.display=canW===false?"none":""}
+
+/* ---- views ---- */
+function route(){const e=location.hash==="#edit";
+ document.documentElement.classList.toggle("ed",e);$("stage").style.display=e?"none":"block";$("editpage").style.display=e?"block":"none";
+ if(e){buildEditor();buildVbtn()}else fit()}
+function fit(){const s=Math.min(innerWidth/1600,innerHeight/900);$("stage").style.transform=`translate(${(innerWidth-1600*s)/2}px,${(innerHeight-900*s)/2}px) scale(${s})`}
+addEventListener("resize",fit);addEventListener("hashchange",route);
+addEventListener("storage",e=>{if(e.key===KEY){loadLocal();renderAll();if(location.hash==="#edit"&&!(document.activeElement&&/INPUT|SELECT/.test(document.activeElement.tagName))){buildEditor();buildVbtn()}}});
+
+/* ---- remote sync (works when the page is opened from claude.ai) ---- */
+async function initDb(){
+ try{
+  if(typeof claude==="undefined"||!claude.use)return;
+  const db=await claude.use("db");if(!db)return;
+  const u=await claude.use("user");canW=u?await u.canEdit():null;
+  dbRef=db.doc("dash/state");setStatus();
+  dbRef.onSnapshot(s=>{
+   if(!s.exists)return;const d=s.data()||{};if(d.rev&&d.rev===myRev)return;
+   if(document.activeElement&&$("editpage").contains(document.activeElement)&&/INPUT|SELECT/.test(document.activeElement.tagName))return;
+   if(Array.isArray(d.items))items=d.items.map(x=>({...x}));if(+d.vol)vol=+d.vol;
+   saveLocal();renderAll();if(location.hash==="#edit"){buildEditor();buildVbtn()}},()=>{});
+ }catch(e){}}
+
+loadLocal();sortI();tick();buildTabs();renderAll();setStatus();route();
+setInterval(tick,1000);setInterval(renderDisplay,15000);
+initDb();
+</script>
+</body>
+</html>
